@@ -75,6 +75,7 @@ echo "    Packaging..."
 mkdir -p dist/stretch
 cp src/module.json dist/stretch/
 cp src/ui.js       dist/stretch/
+cp src/help.json   dist/stretch/
 cp build/dsp.so    dist/stretch/
 chmod +x dist/stretch/dsp.so
 

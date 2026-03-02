@@ -1,0 +1,78 @@
+{
+  "title": "Time Stretch",
+  "children": [
+    {
+      "title": "Overview",
+      "lines": [
+        "Pitch-preserving time",
+        "stretch for WAV files.",
+        "",
+        "Load a sample, set bar",
+        "length and target BPM,",
+        "preview in real time,",
+        "and save the result."
+      ]
+    },
+    {
+      "title": "Controls",
+      "lines": [
+        "Jog wheel: scroll or",
+        " adjust values",
+        "Jog click: enter edit",
+        " or confirm action",
+        "Back: cancel edit or",
+        " exit tool",
+        "Any pad: play / stop",
+        "Knobs: adjust selected",
+        " parameter"
+      ]
+    },
+    {
+      "title": "Parameters",
+      "children": [
+        {
+          "title": "Bars",
+          "lines": [
+            "Source bar length.",
+            "",
+            "Options: 1/4, 1/2, 1,",
+            " 2, 4, 8, 16",
+            "",
+            "Auto-guessed from file",
+            "duration and project",
+            "BPM. Adjust if the",
+            "guess is wrong."
+          ]
+        },
+        {
+          "title": "Target BPM",
+          "lines": [
+            "Desired output tempo.",
+            "Range: 40-300 BPM.",
+            "",
+            "Defaults to project",
+            "BPM. Changes preview",
+            "speed in real time."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Saving",
+      "lines": [
+        "Select Save from the",
+        "menu to save stretched",
+        "audio.",
+        "",
+        "Overwrite: replaces",
+        " the original file",
+        "New File: browse to a",
+        " folder, saves as",
+        " name-BPMbpm.wav",
+        "",
+        "Playback stops during",
+        "rendering."
+      ]
+    }
+  ]
+}
