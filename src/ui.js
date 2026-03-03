@@ -1,5 +1,5 @@
 /*
- * Time Stretch Tool UI
+ * Stretch Tool UI
  *
  * Standard menu-driven UI following Move Anything shared menu patterns.
  * Jog turn scrolls, jog click enters edit / triggers actions, back exits.
@@ -107,6 +107,7 @@ var currentView = VIEW_MAIN;
 /* DSP state */
 var targetBpm = 120;
 var barsIndex = 2;
+var pitchSemitones = 0;
 var playing = false;
 var fileName = "";
 var sourceDuration = 0;
@@ -162,8 +163,17 @@ function getStem(path) {
     return name;
 }
 
+function formatPitch(st) {
+    if (st > 0) return "+" + st + " st";
+    if (st < 0) return st + " st";
+    return "0 st";
+}
+
 function getOutFileName() {
-    return getStem(fileName) + "-" + targetBpm + "bpm.wav";
+    var suffix = pitchSemitones !== 0
+        ? "-" + targetBpm + "bpm" + (pitchSemitones > 0 ? "+" : "") + pitchSemitones + "st.wav"
+        : "-" + targetBpm + "bpm.wav";
+    return getStem(fileName) + suffix;
 }
 
 /* ========== Menu items ========== */
@@ -198,6 +208,18 @@ function buildMenuItems() {
             }
         },
         {
+            type: TYPE_VALUE,
+            label: "Pitch",
+            min: -12,
+            max: 12,
+            step: 1,
+            get: function() { return pitchSemitones; },
+            set: function(v) {
+                pitchSemitones = v;
+                sendPitch();
+            }
+        },
+        {
             type: TYPE_ACTION,
             label: "Save...",
             onAction: function() {
@@ -226,6 +248,9 @@ function readDspState() {
     v = host_module_get_param("target_bars");
     if (v) barsIndex = clamp(parseInt(v, 10) || 0, 0, barsValues.length - 1);
 
+    v = host_module_get_param("pitch_semitones");
+    if (v) pitchSemitones = clamp(parseInt(v, 10) || 0, -12, 12);
+
     v = host_module_get_param("playing");
     if (v) playing = (v === "1");
 
@@ -246,6 +271,7 @@ function readPlayState() {
 
 function sendBpm() { host_module_set_param("target_bpm", String(targetBpm)); }
 function sendBars() { host_module_set_param("target_bars", String(barsIndex)); }
+function sendPitch() { host_module_set_param("pitch_semitones", String(pitchSemitones)); }
 function sendPlaying(v) { host_module_set_param("playing", v ? "1" : "0"); }
 
 /* ========== Destination directory browser ========== */
@@ -501,9 +527,11 @@ function drawMain() {
 
     var srcBpm = getSourceBpm();
     var srcStr = srcBpm > 0 ? "Src: " + srcBpm + " BPM" : "Src: -- BPM";
-    var speedStr = speed.toFixed(2) + "x";
+    var rightStr = pitchSemitones !== 0
+        ? formatPitch(pitchSemitones) + " " + speed.toFixed(2) + "x"
+        : speed.toFixed(2) + "x";
     print(2, SUBTITLE_Y, srcStr, 1);
-    print(SCREEN_W - speedStr.length * CHAR_W - 2, SUBTITLE_Y, speedStr, 1);
+    print(SCREEN_W - rightStr.length * CHAR_W - 2, SUBTITLE_Y, rightStr, 1);
 
     drawMenuList(menuItems, selectedIndex, editing);
 
@@ -559,7 +587,7 @@ function drawSaveBrowser() {
 }
 
 function drawSaving() {
-    drawHeader("Time Stretch");
+    drawHeader("Stretch");
     print(24, 28, "Rendering...", 1);
     print(16, 40, "Please wait", 1);
 }
@@ -574,7 +602,7 @@ function drawWrapped(s, x, y, maxChars, lineH) {
 }
 
 function drawSaved() {
-    drawHeader("Time Stretch");
+    drawHeader("Stretch");
     var maxChars = Math.floor((SCREEN_W - 8) / CHAR_W);
     if (saveResult === "ok") {
         if (saveChoice === 0) {

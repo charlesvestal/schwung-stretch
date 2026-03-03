@@ -1,21 +1,22 @@
 {
-  "title": "Time Stretch",
+  "title": "Stretch",
   "children": [
     {
       "title": "Overview",
       "lines": [
-        "Change the tempo of a",
-        "WAV file without",
-        "altering its pitch.",
+        "Change the tempo and",
+        "pitch of a WAV file",
+        "independently.",
         "",
         "Uses the Bungee",
         "library for high",
         "quality stretching.",
         "",
         "Set the file's bar",
-        "length and target BPM",
-        "to hear the result",
-        "in real time."
+        "length, target BPM,",
+        "and pitch to hear",
+        "the result in real",
+        "time."
       ]
     },
     {
@@ -31,6 +32,8 @@
         "   (1/4 to 16 bars)",
         " Target BPM: desired",
         "   tempo (40-300)",
+        " Pitch: transpose",
+        "   (-12 to +12 st)",
         " Save: export result"
       ]
     },
@@ -46,7 +49,12 @@
         " a destination folder",
         " and save with BPM",
         " in the filename",
-        " (e.g. loop-120bpm)"
+        " (e.g. loop-120bpm)",
+        "",
+        "Pitch is included in",
+        "the filename when",
+        "non-zero (e.g.",
+        " loop-120bpm+3st)"
       ]
     },
     {
@@ -59,9 +67,13 @@
         "at the top alongside",
         "the speed multiplier.",
         "",
+        "Use Pitch to shift",
+        "up or down by up to",
+        "one octave without",
+        "changing the tempo.",
+        "",
         "Press any pad to",
-        "preview the stretched",
-        "audio in real time",
+        "preview in real time",
         "before saving."
       ]
     }

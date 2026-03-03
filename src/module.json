@@ -1,8 +1,8 @@
 {
     "id": "stretch",
-    "name": "Time Stretch",
-    "version": "0.1.0",
-    "description": "Real-time audio time stretching with Bungee",
+    "name": "Stretch",
+    "version": "0.2.0",
+    "description": "Time-stretch and pitch-shift WAV files with Bungee",
     "author": "Move Anything",
     "dsp": "dsp.so",
     "api_version": 2,

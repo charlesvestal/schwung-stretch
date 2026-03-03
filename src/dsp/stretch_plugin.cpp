@@ -92,6 +92,7 @@ struct instance_t {
     int    target_bpm;
     int    bars_index;      // index into BARS_OPTIONS
     int    save_mode;       // 0 = overwrite, 1 = copy
+    int    pitch_semitones; // -12 to +12 (0 = no pitch change)
 
     int    playing;
     float  speed;           // playback speed ratio
@@ -164,11 +165,16 @@ static void feed_grain(instance_t *inst, const Bungee::InputChunk &chunk) {
     inst->stretcher->analyseGrain(inst->grain_input, stride, muteHead, muteTail);
 }
 
+/* Convert semitones to Bungee pitch multiplier. */
+static inline double pitch_multiplier(int semitones) {
+    return pow(2.0, semitones / 12.0);
+}
+
 /* Reset Bungee request for playback start or loop wrap. */
 static void reset_stretcher(instance_t *inst, double position) {
     inst->req.position = position;
     inst->req.speed = (double)inst->speed;
-    inst->req.pitch = 1.0;
+    inst->req.pitch = pitch_multiplier(inst->pitch_semitones);
     inst->req.reset = true;
     inst->req.resampleMode = resampleMode_autoOut;
     inst->stretcher->preroll(inst->req);
@@ -437,7 +443,7 @@ static bool stretch_offline(instance_t *inst, float **out_data, int *out_frames)
     Bungee::Request req{};
     req.position = 0.0;
     req.speed = (double)inst->speed;
-    req.pitch = 1.0;
+    req.pitch = pitch_multiplier(inst->pitch_semitones);
     req.reset = true;
     req.resampleMode = resampleMode_autoOut;
 
@@ -484,8 +490,8 @@ static bool stretch_offline(instance_t *inst, float **out_data, int *out_frames)
     *out_data = result;
     *out_frames = written;
 
-    host_log("[stretch] offline stretch: %d -> %d frames (speed=%.3f)",
-             inst->audio_frames, written, inst->speed);
+    host_log("[stretch] offline stretch: %d -> %d frames (speed=%.3f pitch=%+dst)",
+             inst->audio_frames, written, inst->speed, inst->pitch_semitones);
     return true;
 }
 
@@ -529,8 +535,12 @@ static void do_save(instance_t *inst) {
             host_log("[stretch] mkdir failed for %s", dir);
         }
 
-        snprintf(out_path, sizeof(out_path), "%s/%.100s-%dbpm.wav",
-                 dir, stem, inst->target_bpm);
+        if (inst->pitch_semitones != 0)
+            snprintf(out_path, sizeof(out_path), "%s/%.100s-%dbpm%+dst.wav",
+                     dir, stem, inst->target_bpm, inst->pitch_semitones);
+        else
+            snprintf(out_path, sizeof(out_path), "%s/%.100s-%dbpm.wav",
+                     dir, stem, inst->target_bpm);
     }
 
     host_log("[stretch] saving %d stretched frames to %s", stretched_frames, out_path);
@@ -573,7 +583,7 @@ static void *stretch_create(const char *module_dir, const char *json_defaults) {
     /* Initialize request */
     inst->req.position = 0.0;
     inst->req.speed = 1.0;
-    inst->req.pitch = 1.0;
+    inst->req.pitch = pitch_multiplier(inst->pitch_semitones);
     inst->req.reset = true;
     inst->req.resampleMode = resampleMode_autoOut;
 
@@ -636,6 +646,13 @@ static void stretch_set_param(void *ptr, const char *key, const char *val) {
         inst->bars_index = idx;
         recalc_speed(inst);
     }
+    else if (strcmp(key, "pitch_semitones") == 0) {
+        int v = atoi(val);
+        if (v < -12) v = -12;
+        if (v >  12) v =  12;
+        inst->pitch_semitones = v;
+        inst->req.pitch = pitch_multiplier(v);
+    }
     else if (strcmp(key, "save_mode") == 0) {
         inst->save_mode = atoi(val);
         if (inst->save_mode < 0) inst->save_mode = 0;
@@ -672,6 +689,8 @@ static int stretch_get_param(void *ptr, const char *key, char *buf, int buf_len)
         return snprintf(buf, buf_len, "%d", inst->bars_index);
     if (strcmp(key, "target_bars_label") == 0)
         return snprintf(buf, buf_len, "%s", BARS_LABELS[inst->bars_index]);
+    if (strcmp(key, "pitch_semitones") == 0)
+        return snprintf(buf, buf_len, "%d", inst->pitch_semitones);
     if (strcmp(key, "save_mode") == 0)
         return snprintf(buf, buf_len, "%d", inst->save_mode);
     if (strcmp(key, "playing") == 0)
