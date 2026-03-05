@@ -1,7 +1,7 @@
 {
     "id": "stretch",
     "name": "Stretch",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Time-stretch and pitch-shift WAV files with Bungee",
     "author": "Move Anything",
     "dsp": "dsp.so",
