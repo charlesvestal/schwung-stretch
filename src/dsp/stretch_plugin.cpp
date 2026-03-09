@@ -15,6 +15,8 @@
 #include <cmath>
 #include <cstdarg>
 #include <algorithm>
+#include <unistd.h>
+#include <pwd.h>
 
 #include <bungee/Bungee.h>
 
@@ -407,6 +409,11 @@ static void write_u32_le(uint8_t *p, uint32_t v) {
     p[3] = (v >> 24) & 0xFF;
 }
 
+static void chown_to_ableton(const char *path) {
+    struct passwd *pw = getpwnam("ableton");
+    if (pw) chown(path, pw->pw_uid, pw->pw_gid);
+}
+
 static bool write_wav_stereo(const char *path, const float *data, int frames) {
     FILE *fp = fopen(path, "wb");
     if (!fp) return false;
@@ -442,6 +449,7 @@ static bool write_wav_stereo(const char *path, const float *data, int frames) {
     }
 
     fclose(fp);
+    chown_to_ableton(path);
     return true;
 }
 
