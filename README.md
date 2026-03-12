@@ -12,7 +12,7 @@ Real-time audio time stretching on your Ableton Move using the Bungee library. C
 
 ## Prerequisites
 
-- [Move Everything](https://github.com/charlesvestal/move-anything) installed on your Ableton Move
+- [Move Everything](https://github.com/charlesvestal/move-everything) installed on your Ableton Move
 - SSH access enabled: http://move.local/development/ssh
 
 ## Install
@@ -27,7 +27,7 @@ Real-time audio time stretching on your Ableton Move using the Bungee library. C
 ### Build from Source
 
 ```bash
-git clone https://github.com/charlesvestal/move-anything-stretch
+git clone https://github.com/charlesvestal/move-everything-stretch
 cd move-anything-stretch
 ./scripts/build.sh
 ./scripts/install.sh
@@ -55,7 +55,7 @@ cd move-anything-stretch
 ## Credits
 
 - **Bungee library**: High quality time stretching
-- **Move Everything framework**: [Charles Vestal](https://github.com/charlesvestal/move-anything)
+- **Move Everything framework**: [Charles Vestal](https://github.com/charlesvestal/move-everything)
 
 ## License
 
