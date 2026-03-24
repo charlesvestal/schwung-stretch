@@ -14,20 +14,20 @@ import {
     refreshFilepathBrowser,
     moveFilepathBrowserSelection,
     activateFilepathBrowserItem
-} from '/data/UserData/move-anything/shared/filepath_browser.mjs';
+} from '/data/UserData/schwung/shared/filepath_browser.mjs';
 
 import {
     MovePad1, MovePad32,
     MoveMainButton, MoveMainKnob,
     MoveBack,
     MoveKnob1, MoveKnob8
-} from '/data/UserData/move-anything/shared/constants.mjs';
+} from '/data/UserData/schwung/shared/constants.mjs';
 
 import {
     setLED,
     decodeDelta,
     shouldFilterMessage
-} from '/data/UserData/move-anything/shared/input_filter.mjs';
+} from '/data/UserData/schwung/shared/input_filter.mjs';
 
 /* ========== Layout constants (match shared/menu_layout.mjs) ========== */
 var SCREEN_W = 128;
