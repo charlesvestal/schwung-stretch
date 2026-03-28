@@ -128,6 +128,11 @@ var saveResult = "";
 var exitTimer = 0;
 var saveDestDir = "";
 var saveParamQueue = [];
+var shouldPollFileName = true;
+var initialFilePath = "";
+var initialFilePathAttempts = 0;
+var initialFilePathRetryCountdown = 0;
+var MAX_INITIAL_FILE_PATH_ATTEMPTS = 3;
 
 /* Destination directory browser */
 var destBrowserState = null;
@@ -264,6 +269,7 @@ function readDspState() {
     var v;
     v = host_module_get_param("file_name");
     if (v) fileName = v;
+    shouldPollFileName = !fileName;
 
     v = host_module_get_param("source_duration");
     if (v) sourceDuration = parseFloat(v);
@@ -299,6 +305,34 @@ function readPlayState() {
     if (v) playing = (v === "1");
     v = host_module_get_param("play_pos");
     if (v) playPos = parseFloat(v);
+}
+
+function pollFileName() {
+    if (!shouldPollFileName) return;
+    var v = host_module_get_param("file_name");
+    if (v) {
+        fileName = v;
+        shouldPollFileName = false;
+    }
+}
+
+function sendInitialFilePathIfNeeded() {
+    if (!shouldPollFileName) return;
+    if (!initialFilePath) return;
+    if (initialFilePathAttempts >= MAX_INITIAL_FILE_PATH_ATTEMPTS) return;
+
+    if (initialFilePathRetryCountdown > 0) {
+        initialFilePathRetryCountdown--;
+        return;
+    }
+
+    if (typeof host_module_set_param_blocking === "function") {
+        host_module_set_param_blocking("file_path", initialFilePath, 1000);
+    } else {
+        host_module_set_param("file_path", initialFilePath);
+    }
+    initialFilePathAttempts++;
+    initialFilePathRetryCountdown = 10;
 }
 
 function sendBpm() { host_module_set_param("target_bpm", String(targetBpm)); }
@@ -832,8 +866,12 @@ globalThis.init = function() {
     editValue = null;
     exitTimer = 0;
     pendingJogDelta = 0;
+    initialFilePath = (typeof host_tool_file_path === "string") ? host_tool_file_path : "";
+    initialFilePathAttempts = 0;
+    initialFilePathRetryCountdown = 0;
 
     readDspState();
+    sendInitialFilePathIfNeeded();
     buildMenuItems();
 };
 
@@ -856,6 +894,9 @@ globalThis.tick = function() {
         }
         pendingJogDelta = 0;
     }
+
+    sendInitialFilePathIfNeeded();
+    pollFileName();
 
     if (currentView === VIEW_MAIN) {
         readPlayState();
