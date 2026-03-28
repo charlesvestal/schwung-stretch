@@ -132,7 +132,9 @@ var shouldPollFileName = true;
 var initialFilePath = "";
 var initialFilePathAttempts = 0;
 var initialFilePathRetryCountdown = 0;
-var MAX_INITIAL_FILE_PATH_ATTEMPTS = 3;
+var MAX_INITIAL_FILE_PATH_ATTEMPTS = 2;
+var INITIAL_FILE_PATH_RETRY_TICKS = 4;
+var INITIAL_FILE_PATH_TIMEOUT_MS = 300;
 
 /* Destination directory browser */
 var destBrowserState = null;
@@ -327,12 +329,12 @@ function sendInitialFilePathIfNeeded() {
     }
 
     if (typeof host_module_set_param_blocking === "function") {
-        host_module_set_param_blocking("file_path", initialFilePath, 1000);
+        host_module_set_param_blocking("file_path", initialFilePath, INITIAL_FILE_PATH_TIMEOUT_MS);
     } else {
         host_module_set_param("file_path", initialFilePath);
     }
     initialFilePathAttempts++;
-    initialFilePathRetryCountdown = 10;
+    initialFilePathRetryCountdown = INITIAL_FILE_PATH_RETRY_TICKS;
 }
 
 function sendBpm() { host_module_set_param("target_bpm", String(targetBpm)); }
